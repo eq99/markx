@@ -1,0 +1,44 @@
+markx = { blocks }
+
+blocks={ (inline ~ NEWLINE)* }
+
+inline = { 
+    chars |
+    strong_emphasize
+
+
+}
+
+strong_emphasize = ${ "**"~strong_emphasize_inner~"**" }
+strong_emphasize_inner = { (!("**") ~ chars) }
+strong_emphasize = { "**" ~ (char)* ~ "**" }
+
+
+
+chars = { (!(NEWLINE) ~ ANY)* }
+char = @{ !(NEWLINE) ~ ANY }
+number = @{
+    "-"?
+    ~ ("0" | ASCII_NONZERO_DIGIT ~ ASCII_DIGIT*)
+    ~ ("." ~ ASCII_DIGIT*)?
+    ~ (^"e" ~ ("+" | "-")? ~ ASCII_DIGIT+)?
+}
+
+WHITESPACE = _{ " " | "\t" | "\r" | "\n" }
+
+
+// haha
+string = ${ (!(PEEK | NEWLINE) ~ ANY)* }
+
+mark_tag = @{ "**" | "`" | "$" }
+
+span = ${ PUSH(mark_tag) ~ string ~ POP }
+text = { (!(span | NEWLINE) ~ ANY)+ }
+
+inline = { (span | text)* }
+
+
+
+markx = { blocks }
+blocks = { line* }
+line = { inline ~ NEWLINE }

@@ -1,0 +1,114 @@
+# markdown grammar definition
+# See https://docs.python.org/3/reference/grammar.html for example
+# Or https://github.com/Domysee/MarkdownEbnf/blob/master/Markdown%20EBNF.txt
+
+
+file: blocks EOF
+
+blocks: (block EOL*)* # EOL: end of line marker
+
+block:
+    | head
+    | paragraph
+    | fenced_code
+    | display_latex
+    | image
+    | block_quote
+    | lists
+    | table
+    | exercise
+    | math_env
+
+head: h1 | h2 | h3
+
+h1: '# ' line
+h2: '## ' line
+h3: '### ' line
+
+
+line: inline EOL
+
+inline:  strong_emphasis | emphasis | inline_math | inline_code | inline_url | inline_image | emoji | text
+
+strong_emphasis: '**' chars '**'
+emphasis: '*' ascii_chars '*'
+inline_math: '$' chars '$'
+inline_code: '`' chars '`'
+inline_url: '[' attrs '](' url ')'
+inline_image: '![' attrs '](' url ')'
+emoji: ':' emoji_name ':'
+chars: utf8_char*
+text: chars - EOL
+attrs: text
+
+space: U+0020
+tab: U+0009
+newline: U+000A
+carriage_return: U+000D
+lineTabulation: U+000B
+formFeed: U+000C
+
+EOL: newline | carriage_return | carriage_return newline
+
+paragraph: line
+
+fenced_code: '```' language_name? EOL plain_line* '```' EOL
+language_name: 'C' | 'java' | 'js' | 'rust' | 'python' | 'sh'
+
+display_latex: '$$' EOL plain_line* '$$' EOL
+plain_line: text EOL
+
+
+image: inline_image EOL
+
+
+url: (protel port? )? path
+protel: 'http://' | 'https://'
+port: ':' digit
+path: '/'? text
+
+block_quote: quote_name ('>' line)*
+quote_name: quote | warn | danger | info | tip | think
+quote: 'quote' | '引用'
+warn: 'warn' | '警告'
+dnager: 'dnager' | '危险'
+info: 'info' | '提示'
+tip: 'tip' | '技巧'
+think: 'think' | '思考'
+
+lists: bullet_list              # | ordered_list : can be bug if there are blocks inside 
+bullet_list: ('-' space line)+
+
+
+table: th td*
+th: ( '|' inline)*m '|' EOL ('|' '-'* )*m '|' EOL   # ()*m: times m
+td: ( '|' inline)*m '|' EOL
+
+
+exercise: '//' exercise_type EOL exercise_head exercise_body exercise_answers '//' EOL
+
+exercise_type: ss | ms | co | qa
+ss: 'ss' | '单选'
+ms: 'ms' | '多选'
+co: 'co' | '填空'
+qa: 'qa' | '问答'
+
+exercise_head: line
+exercise_body: lists
+exercise_answers: ('!!' line)*
+
+math_env: '%%' math_env_name EOL math_env_body '%%' EOL
+
+math_env_name: lem | pro | def | thm | solve | cor
+lem: 'lem' | '定理'
+pro: 'pro' | '证明'
+def: 'def' | '证明'
+thm: 'thm' | '定理'
+solve: 'solve' | '解'
+cor: 'cor' | '推论'
+
+math_env_body: 
+    | line
+    | display_latex
+    | lists
+

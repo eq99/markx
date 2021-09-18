@@ -1,54 +1,52 @@
-#![allow(dead_code)]
+#![allow(unused)]
 
-use nom::{
-    bytes::complete::{tag, take_while_m_n},
-    combinator::map_res,
-    sequence::tuple,
-    IResult,
-};
+#[derive(Debug)]
+struct Mark(String);
 
-#[derive(Debug, PartialEq)]
-pub struct Color {
-    pub red: u8,
-    pub green: u8,
-    pub blue: u8,
+#[derive(Debug)]
+struct Block(String);
+
+#[derive(Debug)]
+pub struct Parser {
+    marks: Vec<Mark>,
+    blocks: Vec<Block>,
 }
 
-fn from_hex(input: &str) -> Result<u8, std::num::ParseIntError> {
-    u8::from_str_radix(input, 16)
-}
+impl Parser {
+    pub fn new() -> Self {
+        Parser {
+            marks: Vec::new(),
+            blocks: Vec::new(),
+        }
+    }
 
-fn is_hex_digit(c: char) -> bool {
-    c.is_digit(16)
-}
+    pub fn parse(&mut self, input: &String) {
+        self.marks.push(Mark(String::from("**")));
+    }
 
-fn hex_primary(input: &str) -> IResult<&str, u8> {
-    map_res(take_while_m_n(2, 2, is_hex_digit), from_hex)(input)
-}
-
-fn hex_color(input: &str) -> IResult<&str, Color> {
-    let (input, _) = tag("#")(input)?;
-    let (input, (red, green, blue)) = tuple((hex_primary, hex_primary, hex_primary))(input)?;
-
-    Ok((input, Color { red, green, blue }))
+    pub fn show(&self) {
+        println!("{:?}", self.marks);
+    }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use super::Parser;
+    use std::fs;
+
+    fn print_type_of<T>(_: &T) {
+        println!("{}", std::any::type_name::<T>())
+    }
 
     #[test]
-    fn parse_color() {
-        assert_eq!(
-            hex_color("#2F14DF"),
-            Ok((
-                "",
-                Color {
-                    red: 47,
-                    green: 20,
-                    blue: 223,
-                }
-            ))
-        );
+    fn it_worked() {
+        // run with cargo test -- --nocapture
+        let input = fs::read_to_string("tests/test.md").unwrap();
+        println!("{:?}", input);
+        print_type_of(&input);
+
+        let mut parser: Parser = Parser::new();
+        parser.parse(&input);
+        parser.show();
     }
 }
