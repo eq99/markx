@@ -23,14 +23,25 @@ impl Parser {
     }
 
     pub fn parse(&mut self, input: &String) {
+        // mark will gather block markers like '#', '>', '-', '`', '$'
         let mut mark = Vec::new();
+
+        // start will note the start idx of a block
         let mut start = 0usize;
+
+        // pre will note successive marker like '$$', '```'
         let mut pre = 0usize;
+
+        // inline will note start marker like '-', '#, '>',
+        // so that we can  distinguish the following cases:
+        // - # this is a head
+        // - This is # not a head
         let mut inline = false;
+
         for (idx, char) in input.char_indices() {
             match char {
                 '#' => {
-                    if !inline || idx - pre == 1 {
+                    if !inline {
                         println!("Head start...");
                         mark.push(char);
                         pre = idx;
