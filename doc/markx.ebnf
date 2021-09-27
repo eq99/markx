@@ -104,7 +104,7 @@ lem: 'lem' | '定理'
 pro: 'pro' | '证明'
 def: 'def' | '证明'
 thm: 'thm' | '定理'
-solve: 'solve' | '解'
+sol: 'sol' | '解'
 cor: 'cor' | '推论'
 
 math_env_body: 

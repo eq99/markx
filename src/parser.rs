@@ -165,6 +165,9 @@ impl Parser {
                 }
             }
         }
+
+        // in case the last paragraph that's not ended with 'newline'
+        println!("Get paragraph {:?}", &input[start..]);
     }
 
     pub fn show(&self) {
@@ -185,6 +188,7 @@ mod tests {
     fn it_worked() {
         // run with cargo test -- --nocapture
         let input = fs::read_to_string("tests/test3.md").unwrap();
+        let input = String::from("# hello");
         let mut parser: Parser = Parser::new();
         parser.parse(&input);
         parser.show();
