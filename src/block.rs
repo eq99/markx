@@ -1,5 +1,6 @@
 #![allow(unused)]
 
+use crate::head;
 use std::collections::HashMap;
 
 #[derive(Debug)]
@@ -43,34 +44,33 @@ impl BlockParser {
                 // One thing need to note:
                 // This can be a normal code block or
                 // a block in `Pre Block, Exercise Block.`
-
                 if open_tag.is_empty() {
-                    // normal fenced code starts
+                    // start of normal fenced code.
                     open_tag += "```";
                     multi_line += line.trim_start_matches('`');
                     multi_line += "\n";
                 } else if open_tag.starts_with("`") {
-                    // normal fenced code ends
+                    // end of normal fenced code.
                     println!("Get CODE: {}", multi_line);
                     open_tag.clear();
                     multi_line.clear();
                 } else {
-                    // fenced code in some other block.
+                    // fenced code is in some other blocks.
                     multi_line += line;
                     multi_line += "\n";
                 }
             } else if line.starts_with("$$") {
-                // The logic is same as fenced code
+                // The logic is same as fenced code.
                 if open_tag.is_empty() {
-                    // display math starts.
+                    // start of display math.
                     open_tag += "$$";
                 } else if open_tag.starts_with("$") {
-                    // display math ends.
+                    // end of display math.
                     println!("Get Math: {}", multi_line);
                     open_tag.clear();
                     multi_line.clear();
                 } else {
-                    // display math in other block.
+                    // display math is in other block.
                     multi_line += line;
                     multi_line += "\n";
                 }
@@ -114,7 +114,8 @@ mod tests {
     }
 
     #[test]
-    fn it_worked() {
+    #[ignore]
+    fn test_blocks() {
         // run with cargo test -- --nocapture
         let input = fs::read_to_string("tests/test3.md").unwrap();
         let mut parser: BlockParser = BlockParser::new();

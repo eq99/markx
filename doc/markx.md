@@ -22,9 +22,7 @@ CommonMark 语法标准可以参考 [CommonMark Spec](https://spec.commonmark.or
 
 
 
-# 行内元素
-
-
+# 行内元素(Inline)
 
 ## 行内代码（Code spans）
 
@@ -32,6 +30,38 @@ CommonMark 语法标准可以参考 [CommonMark Spec](https://spec.commonmark.or
 
 ```markdown
 `hi`
+```
+
+## Emoji
+
+由一对冒号和emoji名字组成：
+
+```markdown
+:+1:
+```
+
+
+
+## 行内公式（Inline math）
+
+由一对美元符括起来的部分。
+
+```markdown
+$e^{i\pi)+1=0$
+```
+
+## 自动链接（Autolinks）
+
+由尖括号括起来的文字：
+
+```markdown
+<http://foo.bar.baz>
+```
+
+会被转为：
+
+```html
+<a href="http://foo.bar.baz">http://foo.bar.baz</a>
 ```
 
 
@@ -78,23 +108,7 @@ CommonMark 语法标准可以参考 [CommonMark Spec](https://spec.commonmark.or
 
 
 
-## 自动链接（Autolinks）
-
-由尖括号括起来的文字：
-
-```markdown
-<http://foo.bar.baz>
-```
-
-会被转为：
-
-```html
-<a href="http://foo.bar.baz">http://foo.bar.baz</a>
-```
-
-
-
-## 普通文本
+## 普通文本(Text)
 
 不是以上行内元素组成的字符串就会被当做普通文本。
 
@@ -106,19 +120,7 @@ CommonMark 语法标准可以参考 [CommonMark Spec](https://spec.commonmark.or
 
 接下来我们来看看一些块级元素的定义，这里定义的块级元素参考了 CommonMark，但并没有完全遵守，我们还自定义了一些块级元素。
 
-## 分割线（Thematic breaks）
-
-典型的分割线语法为：
-
-```markdown
----
-```
-
-解析为：
-
-```html
-<hr>
-```
+块级元素可以分为两种，一种是容器块，一种是内容块。它们之间的区别是容器块可能包含其他块，内容块不包含其他块。
 
 
 
