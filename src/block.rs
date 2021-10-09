@@ -1,26 +1,18 @@
 #![allow(unused)]
 
-use crate::head;
-use std::collections::HashMap;
-
-#[derive(Debug)]
-struct Mark(String);
+use crate::inline::{parse_inline, Span};
 
 #[derive(Debug)]
 struct Block(String);
 
 #[derive(Debug)]
 pub struct BlockParser {
-    marks: Vec<Mark>,
     blocks: Vec<Block>,
 }
 
 impl BlockParser {
     pub fn new() -> Self {
-        BlockParser {
-            marks: Vec::new(),
-            blocks: Vec::new(),
-        }
+        BlockParser { blocks: Vec::new() }
     }
 
     pub fn parse(&mut self, input: &String) {
@@ -48,7 +40,7 @@ impl BlockParser {
                     // start of normal fenced code.
                     open_tag += "```";
                     multi_line += line.trim_start_matches('`');
-                    multi_line += "\n";
+                    multi_line += "\r\n";
                 } else if open_tag.starts_with("`") {
                     // end of normal fenced code.
                     println!("Get CODE: {}", multi_line);
@@ -104,9 +96,50 @@ impl BlockParser {
         println!("{:?}", self.blocks);
     }
 }
+
+#[derive(Debug)]
+pub struct Heading {
+    level: usize,
+    spans: Vec<Span>,
+}
+
+pub fn parse_heading(input: &String) -> Heading {
+    let head_marks = input.split_whitespace().next().unwrap_or("");
+    let head_body = input
+        .strip_prefix(&format!("{} ", head_marks))
+        .unwrap_or("");
+
+    let spans = parse_inline(&String::from(head_body));
+
+    Heading {
+        level: head_marks.len(),
+        spans: spans,
+    }
+}
+
+#[derive(Debug)]
+pub struct FencedCode {
+    lang: String,
+    code: String,
+}
+
+/// Note: the first line of the input contains meta data about the code.
+/// and the first line is seprated by '\r\n'
+pub fn parse_fenced_code(input: &String) -> FencedCode {
+    let mut splitor = input.split("\r\n");
+    let meta_line = splitor.next().unwrap_or("");
+    let code = splitor.next().unwrap_or("");
+
+    let lang = meta_line.split_whitespace().next().unwrap_or("");
+    FencedCode {
+        lang: String::from(lang),
+        code: String::from(code),
+    }
+}
+
 #[cfg(test)]
 mod tests {
-    use super::BlockParser;
+    use super::*;
     use std::fs;
 
     fn print_type_of<T>(_: &T) {
@@ -114,12 +147,29 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
     fn test_blocks() {
         // run with cargo test -- --nocapture
-        let input = fs::read_to_string("tests/test3.md").unwrap();
+        let input = fs::read_to_string("tests/test2.md").unwrap();
+        //println!("{:?}", input);
         let mut parser: BlockParser = BlockParser::new();
         parser.parse(&input);
         parser.show();
+    }
+
+    fn test_heading() {
+        // run with cargo test -- --nocapture
+        let input = String::from("# hello $math$");
+
+        let head = parse_heading(&input);
+        println!("{:?}", head);
+    }
+
+    #[test]
+    fn test_fenced_code() {
+        // run with cargo test -- --nocapture
+        let input = String::from("python\r\nfor x in range(0, 20, 2):\nprint(x, end=\" \")");
+
+        let code = parse_fenced_code(&input);
+        println!("{:?}", code);
     }
 }
