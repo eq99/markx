@@ -134,6 +134,14 @@ pub fn parse_display_math(input: &String) -> DisplayMath {
     DisplayMath(String::from(input))
 }
 
+pub struct ListItem(String);
+
+pub fn parse_list_item(input: &String) -> ListItem {
+    ListItem(String::from(input.strip_prefix("- ").unwrap_or("")))
+}
+
+
+
 #[cfg(test)]
 mod tests {
     use super::*;
