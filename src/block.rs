@@ -127,6 +127,13 @@ pub fn parse_fenced_code(input: &String) -> FencedCode {
     }
 }
 
+#[derive(Debug)]
+pub struct DisplayMath(String);
+
+pub fn parse_display_math(input: &String) -> DisplayMath {
+    DisplayMath(String::from(input))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
