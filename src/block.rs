@@ -67,7 +67,7 @@ pub fn parse_doc(input: &String) {
                 // pre block starts.
                 open_tag += "%%";
                 multi_line += line.trim_start_matches('%');
-                multi_line += "\n";
+                multi_line += "\r\n";
             } else {
                 // end of pre block.
                 println!("Get Pre: {}", multi_line);
@@ -134,13 +134,43 @@ pub fn parse_display_math(input: &String) -> DisplayMath {
     DisplayMath(String::from(input))
 }
 
+#[derive(Debug)]
 pub struct ListItem(String);
 
 pub fn parse_list_item(input: &String) -> ListItem {
     ListItem(String::from(input.strip_prefix("- ").unwrap_or("")))
 }
 
+#[derive(Debug)]
+pub struct Pre {
+    name: String,
+    title: String,
+    content: String,
+}
 
+pub fn parse_pre(input: &String) -> Pre {
+    let mut splitor = input.split("\r\n");
+    let meta_line = splitor.next().unwrap_or("");
+    let content = splitor.next().unwrap_or("");
+
+    let mut meta_splitor = meta_line.split_whitespace();
+
+    let name = meta_splitor.next().unwrap_or("");
+    let title = meta_splitor.next().unwrap_or("");
+
+    Pre {
+        name: String::from(name),
+        title: String::from(title),
+        content: String::from(""),
+    }
+}
+
+#[derive(Debug)]
+pub struct Paragraph(String);
+
+pub fn parse_paragraph(input: &String) -> Paragraph {
+    Paragraph(String::from(input))
+}
 
 #[cfg(test)]
 mod tests {
