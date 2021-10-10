@@ -2,21 +2,21 @@
 
 use std::collections::HashMap;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Link {
     inner_text: String,
     href: String,
     title: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Img {
     alt: String,
     src: String,
     title: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Span {
     Code(String),
     Math(String),
@@ -228,7 +228,6 @@ pub fn parse_inline(input: &String) -> Vec<Span> {
     // return result
     spans
 }
-
 
 #[cfg(test)]
 mod tests {
