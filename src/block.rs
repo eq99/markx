@@ -103,13 +103,7 @@ pub enum Block {
     LeafBlock(LeafBlock),
     ContainerBlock(ContainerBlock),
 }
-
-pub trait Parser {
-    fn parse(&mut self, input: &String) -> Self;
-}
-
-#[derive(Debug)]
-pub struct Document(Vec<Block>);
+ 
 
 pub fn parse_doc(input: &String) -> Vec<Block> {
     let mut blocks = vec![];
@@ -127,8 +121,8 @@ pub fn parse_doc(input: &String) -> Vec<Block> {
         if line.starts_with("# ") || line.starts_with("## ") || line.starts_with("### ") {
             // Get heading.
             // Note: Only h1, h2, h3 is allowed.
-            let h1 = parse_heading(&String::from(line));
-            blocks.push(Block::LeafBlock(LeafBlock::Heading(h1)));
+            let h = parse_heading(&String::from(line));
+            blocks.push(Block::LeafBlock(LeafBlock::Heading(h)));
         } else if line.starts_with("- ") {
             // Get list item.
             let list_item = parse_list_item(&String::from(line));
