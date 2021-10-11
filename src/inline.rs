@@ -1,7 +1,5 @@
 #![allow(unused)]
 
-use std::collections::HashMap;
-
 #[derive(Debug, Clone)]
 pub struct Link {
     link_text: String,
@@ -25,8 +23,6 @@ pub fn parse_inline(input: &String) -> Vec<Span> {
 
     // Inline spans can not be nested.
     let mut open_tag = vec![];
-    let mut text = String::from("");
-
     let mut indexs: Vec<usize> = Vec::new();
     let mut tags: Vec<char> = Vec::new();
     for (_index, _tag) in input.char_indices() {

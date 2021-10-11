@@ -103,7 +103,6 @@ pub enum Block {
     LeafBlock(LeafBlock),
     ContainerBlock(ContainerBlock),
 }
- 
 
 pub fn parse_doc(input: &String) -> Vec<Block> {
     let mut blocks = vec![];
