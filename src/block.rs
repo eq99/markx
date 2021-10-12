@@ -114,7 +114,6 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
     fn test_blocks() {
         // run with cargo test -- --nocapture
         let input = fs::read_to_string("tests/test3.md").unwrap();
