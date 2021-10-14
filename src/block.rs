@@ -8,6 +8,22 @@ pub struct Heading {
     spans: Vec<Span>,
 }
 
+impl Heading {
+    pub fn tohtml(&self) -> String {
+        if self.spans.len() > 0 {
+            let mut html = String::from("");
+
+            for span in &self.spans {
+                html = format!("{}{}", html, span.tohtml());
+            }
+            // return html
+            format!("<h{}>{}</h{}>", self.level, html, self.level)
+        } else {
+            format!("")
+        }
+    }
+}
+
 pub fn parse_heading(input: &String) -> Heading {
     let raw_head = input.trim_start_matches('#');
 
@@ -21,6 +37,15 @@ pub fn parse_heading(input: &String) -> Heading {
 pub struct FencedCode {
     lang: String,
     code: String,
+}
+
+impl FencedCode {
+    pub fn tohtml(&self) -> String {
+        format!(
+            "<pre><code class=\"lang-{}\">{}</code></pre>",
+            self.lang, self.code
+        )
+    }
 }
 
 /// Note: the first line of the input contains meta data about the code.
@@ -40,12 +65,35 @@ pub fn parse_fenced_code(input: &String) -> FencedCode {
 #[derive(Debug, Clone)]
 pub struct DisplayMath(String);
 
+impl DisplayMath {
+    pub fn tohtml(&self) -> String {
+        let DisplayMath(math) = self;
+        format!("<p>\\[{}\\]</p>", math)
+    }
+}
+
 pub fn parse_display_math(input: &String) -> DisplayMath {
     DisplayMath(String::from(input))
 }
 
 #[derive(Debug, Clone)]
 pub struct ListItem(Vec<Span>);
+
+impl ListItem {
+    pub fn tohtml(&self) -> String {
+        let ListItem(spans) = self;
+
+        if spans.is_empty() {
+            format!("")
+        } else {
+            let mut html = String::from("");
+            for span in spans {
+                html = format!("{}{}", html, span.tohtml());
+            }
+            format!("<li>{}</li>", html)
+        }
+    }
+}
 
 pub fn parse_list_item(input: &String) -> ListItem {
     ListItem(parse_inline(&String::from(
@@ -56,6 +104,22 @@ pub fn parse_list_item(input: &String) -> ListItem {
 #[derive(Debug, Clone)]
 pub struct Paragraph(Vec<Span>);
 
+impl Paragraph {
+    pub fn tohtml(&self) -> String {
+        let Paragraph(spans) = self;
+
+        if spans.is_empty() {
+            format!("")
+        } else {
+            let mut html = String::from("");
+            for span in spans {
+                html = format!("{}{}", html, span.tohtml());
+            }
+            format!("<p>{}</p>", html)
+        }
+    }
+}
+
 pub fn parse_paragraph(input: &String) -> Paragraph {
     Paragraph(parse_inline(input))
 }
@@ -65,6 +129,66 @@ pub struct Pre {
     name: String,
     title: String,
     leafs: Vec<LeafBlock>,
+}
+
+impl Pre {
+    pub fn tohtml(&self) -> String {
+        let inner_html = if self.leafs.is_empty() {
+            format!("")
+        } else {
+            let mut ul = String::from("");
+            let mut leaf_html = String::from("");
+            for leaf in &self.leafs {
+                match leaf {
+                    LeafBlock::ListItem(list) => {
+                        ul = format!("{}{}", ul, list.tohtml());
+                    }
+                    LeafBlock::Paragraph(leaf) => {
+                        if ul.is_empty() {
+                            leaf_html = format!("{}{}", leaf_html, leaf.tohtml());
+                        } else {
+                            leaf_html = format!("{}<ul>{}</ul>{}", leaf_html, ul, leaf.tohtml());
+                            ul.clear();
+                        }
+                    }
+                    LeafBlock::DisplayMath(leaf) => {
+                        if ul.is_empty() {
+                            leaf_html = format!("{}{}", leaf_html, leaf.tohtml());
+                        } else {
+                            leaf_html = format!("{}<ul>{}</ul>{}", leaf_html, ul, leaf.tohtml());
+                            ul.clear();
+                        }
+                    }
+                    LeafBlock::FencedCode(leaf) => {
+                        if ul.is_empty() {
+                            leaf_html = format!("{}{}", leaf_html, leaf.tohtml());
+                        } else {
+                            leaf_html = format!("{}<ul>{}</ul>{}", leaf_html, ul, leaf.tohtml());
+                            ul.clear();
+                        }
+                    }
+                    LeafBlock::Heading(leaf) => {
+                        if ul.is_empty() {
+                            leaf_html = format!("{}{}", leaf_html, leaf.tohtml());
+                        } else {
+                            leaf_html = format!("{}<ul>{}</ul>{}", leaf_html, ul, leaf.tohtml());
+                            ul.clear();
+                        }
+                    }
+                }
+            }
+            // gather last list
+            if !ul.is_empty() {
+                leaf_html = format!("{}<ul>{}</ul>", leaf_html, ul);
+            }
+            leaf_html
+        };
+
+        format!(
+            "<md-pre name=\"{}\" title=\"{}\">{}</md-pre>",
+            self.name, self.title, inner_html
+        )
+    }
 }
 
 pub fn parse_pre(input: &String) -> Pre {
@@ -93,15 +217,44 @@ pub enum LeafBlock {
     ListItem(ListItem),
 }
 
+impl LeafBlock {
+    pub fn tohtml(&self) -> String {
+        match self {
+            LeafBlock::Heading(leaf) => leaf.tohtml(),
+            LeafBlock::FencedCode(leaf) => leaf.tohtml(),
+            LeafBlock::DisplayMath(leaf) => leaf.tohtml(),
+            LeafBlock::Paragraph(leaf) => leaf.tohtml(),
+            LeafBlock::ListItem(leaf) => leaf.tohtml(),
+        }
+    }
+}
+
 #[derive(Debug)]
 pub enum ContainerBlock {
     Pre(Pre),
+}
+
+impl ContainerBlock {
+    pub fn tohtml(&self) -> String {
+        match self {
+            Self::Pre(p) => p.tohtml(),
+        }
+    }
 }
 
 #[derive(Debug)]
 pub enum Block {
     LeafBlock(LeafBlock),
     ContainerBlock(ContainerBlock),
+}
+
+impl Block {
+    pub fn tohtml(&self) -> String {
+        match self {
+            Self::ContainerBlock(c) => c.tohtml(),
+            Self::LeafBlock(leaf) => leaf.tohtml(),
+        }
+    }
 }
 
 pub fn parse_doc(input: &String) -> Vec<Block> {
@@ -241,6 +394,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     fn test_blocks() {
         // run with cargo test -- --nocapture
         let input = fs::read_to_string("tests/test4.md").unwrap();
@@ -249,22 +403,22 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
+    // #[ignore]
     fn test_heading() {
         // run with cargo test -- --nocapture
-        let input = String::from("# hello $math$");
+        let input = String::from("# hello $math$ `1+1`");
 
         let head = parse_heading(&input);
-        println!("{:?}", head);
+        println!("headiiiiiiiiiiig: {:?}", head.tohtml());
     }
 
     #[test]
-    #[ignore]
+    // #[ignore]
     fn test_fenced_code() {
         // run with cargo test -- --nocapture
         let input = String::from("python\r\nfor x in range(0, 20, 2):\nprint(x, end=\" \")");
 
         let code = parse_fenced_code(&input);
-        println!("{:?}", code);
+        println!("{:?}", code.tohtml());
     }
 }

@@ -12,10 +12,48 @@ pub struct Link {
 pub enum Span {
     Code(String),
     Math(String),
-    Emoji(String),
     Strong(String),
     Link(Link),
     Text(String),
+}
+
+impl Span {
+    pub fn tohtml(&self) -> String {
+        match &*self {
+            Self::Code(text) => {
+                format!("<code>{}</code>", text)
+            }
+            Self::Math(text) => {
+                format!("\\({}\\)", text)
+            }
+            Self::Strong(text) => {
+                format!("<strong>{}</strong>", text)
+            }
+            Self::Link(link) => {
+                match link.kind {
+                    1 => {
+                        // image
+                        format!(
+                            "<img src=\"{}\" alt=\"{}\" title=\"{}\">",
+                            link.href, link.link_text, link.title
+                        )
+                    }
+                    _ => {
+                        format!(
+                            "<a href=\"{}\" title=\"{}\">{}</a>",
+                            link.href, link.title, link.link_text,
+                        )
+                    }
+                }
+            }
+            Self::Text(text) => {
+                format!("{}", text)
+            }
+            _ => {
+                format!("")
+            }
+        }
+    }
 }
 
 pub fn parse_inline(input: &String) -> Vec<Span> {
@@ -48,19 +86,6 @@ pub fn parse_inline(input: &String) -> Vec<Span> {
                 }
                 None => {
                     open_tag.push('$');
-                    indexs.push(_index);
-                    tags.push(_tag);
-                }
-                _ => {}
-            },
-            ':' => match open_tag.last() {
-                Some(':') => {
-                    open_tag.pop();
-                    indexs.push(_index);
-                    tags.push(_tag);
-                }
-                None => {
-                    open_tag.push(':');
                     indexs.push(_index);
                     tags.push(_tag);
                 }
@@ -155,20 +180,7 @@ pub fn parse_inline(input: &String) -> Vec<Span> {
     let mut last = 0usize;
     let max_len = indexs.len();
     while idx < max_len {
-        if tags[idx] == ':' && idx + 1 < max_len && tags[idx + 1] == ':' {
-            // store the text
-            if indexs[idx] - last > 0 {
-                spans.push(Span::Text(String::from(&input[last..indexs[idx]])));
-            }
-            // store emoji
-            spans.push(Span::Emoji(String::from(
-                &input[indexs[idx] + 1..indexs[idx + 1]],
-            )));
-            // next
-            last = indexs[idx + 1] + 1;
-            idx += 2;
-            continue;
-        } else if tags[idx] == '$' && idx + 1 < max_len && tags[idx + 1] == '$' {
+        if tags[idx] == '$' && idx + 1 < max_len && tags[idx + 1] == '$' {
             // store the text
             if indexs[idx] - last > 0 {
                 spans.push(Span::Text(String::from(&input[last..indexs[idx]])));
@@ -344,10 +356,11 @@ pub fn parse_inline(input: &String) -> Vec<Span> {
 
 #[cfg(test)]
 mod tests {
-    use super::parse_inline;
+    use super::*;
     use std::fs;
 
     #[test]
+    #[ignore]
     fn test_inline() {
         // run with cargo test -- --nocapture
         let input = String::from("`hello`  :+1: hello **我是粗体**，`markx` is good，哈哈。$\\pi$，[链接](/hello/word \"hello\") ![图片](我是图片链接 \"标题\")，解析我");
@@ -357,9 +370,33 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     fn test_inline2() {
         let input = String::from("`int(input(\"请输入你猜的数字：\"))`：`input()` 表示输出一段提示语句，然后以字符串形式接收你输入的内容，`int()` 表示把输入的内容转化为整数。");
         let spans = parse_inline(&input);
         println!("{:?}", spans);
+    }
+    #[test]
+    fn span_tohtml() {
+        let c = Span::Code("fn".to_string());
+        let m = Span::Math("f(x)".to_string());
+        let t = Span::Text("f(x)".to_string());
+        let l = Span::Link(Link {
+            link_text: "More".to_string(),
+            href: "/more".to_string(),
+            title: "More".to_string(),
+            kind: 0,
+        });
+        let i = Span::Link(Link {
+            link_text: "上海鲜花港 - 郁金香".to_string(),
+            href: "https://www.w3school.com.cn/i/eg_tulip.jpg".to_string(),
+            title: "上海鲜花港 - 郁金香".to_string(),
+            kind: 1,
+        });
+        println!("{}", c.tohtml());
+        println!("{}", m.tohtml());
+        println!("{}", t.tohtml());
+        println!("{}", l.tohtml());
+        println!("{}", i.tohtml());
     }
 }

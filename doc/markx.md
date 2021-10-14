@@ -45,11 +45,7 @@ CommonMark 语法标准可以参考 [CommonMark Spec](https://spec.commonmark.or
 
 ## Emoji
 
-由一对冒号和emoji名字组成：
-
-```markdown
-:+1:
-```
+本解析器不支持Emoji :+1: 语法，请直接复制粘贴相关表情。
 
 
 
