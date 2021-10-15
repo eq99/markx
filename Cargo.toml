@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2018"
 description="Markx is a simple markdown parser."
 license-file="LICENSE" 
-documentation=""
+documentation="https://github.com/xiayulu/markx"
 homepage="https://github.com/xiayulu/markx" 
 repository="https://github.com/xiayulu/markx"
 
