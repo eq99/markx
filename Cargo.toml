@@ -3,7 +3,6 @@ name = "markx"
 version = "0.1.0"
 edition = "2018"
 description="Markx is a simple markdown parser."
-license="MIT"
 license-file="LICENSE" 
 documentation=""
 homepage="https://github.com/xiayulu/markx" 
@@ -16,7 +15,7 @@ exclude = [
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[dependencies]
-clap = "2"
-tera = "1"
+#[dependencies]
+#clap = "2"
+#tera = "1"
 
