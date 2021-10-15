@@ -49,7 +49,7 @@ impl FencedCode {
 }
 
 /// Note: the first line of the input contains meta data about the code.
-/// and the first line is seprated by '\r\n'
+/// The first line is seprated by '\r\n', while the other line is seprated by '\n'.
 pub fn parse_fenced_code(input: &String) -> FencedCode {
     let mut splitor = input.split("\r\n");
     let meta_line = splitor.next().unwrap_or("");
