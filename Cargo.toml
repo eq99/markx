@@ -2,7 +2,15 @@
 name = "markx"
 version = "0.1.0"
 edition = "2018"
+description="Markx is a simple markdown parser."
+license="MIT"
+license-file="LICENSE" 
+documentation=""
+homepage="https://github.com/xiayulu/markx" 
+repository="https://github.com/xiayulu/markx"
+
 exclude = [
+    "main.rs",
     "trash/*",
 ]
 
