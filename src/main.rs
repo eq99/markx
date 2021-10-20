@@ -20,7 +20,7 @@ fn main() -> std::io::Result<()> {
         input_file_name = String::from(f);
     }
 
-    input_file_name = String::from("tests/test4.md");
+    input_file_name = String::from("tests/test2.md");
     let mut outfile_name = PathBuf::from(&input_file_name);
     outfile_name.set_extension("html");
     let input = fs::read_to_string(&input_file_name).unwrap();

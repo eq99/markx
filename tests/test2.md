@@ -5,6 +5,7 @@
 ```python
 import random
 
+# 猜数字游戏 
 print("==猜数字(0-20)==")
 number = random.randint(0,20)
 while True:

@@ -42,7 +42,7 @@ pub struct FencedCode {
 impl FencedCode {
     pub fn tohtml(&self) -> String {
         format!(
-            "<pre><code class=\"lang-{}\">{}</code></pre>",
+            "<pre><code class=\"language-{}\">{}</code></pre>",
             self.lang, self.code
         )
     }
@@ -270,7 +270,10 @@ pub fn parse_doc(input: &String) -> Vec<Block> {
     let mut container = ' ';
 
     for line in input.lines() {
-        if line.starts_with("# ") || line.starts_with("## ") || line.starts_with("### ") {
+        if (line.starts_with("# ") || line.starts_with("## ") || line.starts_with("### "))
+            && tag_stack.is_empty()
+        // fix python comments
+        {
             // Get heading.
             // Note: Only h1, h2, h3 is allowed.
             let h = parse_heading(&String::from(line));

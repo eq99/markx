@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Welcome to MarkX</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.25.0/themes/prism.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.18/dist/katex.min.css"
+        integrity="sha384-zTROYFVGOfTw7JV7KUu8udsvW2fx4lWOsCEDqhBreBwlHI4ioVRtmIvEThzJHGET" crossorigin="anonymous">
+
+    <!-- The loading of KaTeX is deferred to speed up page rendering -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.18/dist/katex.min.js"
+        integrity="sha384-GxNFqL3r9uRJQhR+47eDxuPoNE7yLftQM8LcxzgS4HT73tp970WS/wV5p8UzCOmb"
+        crossorigin="anonymous"></script>
+
+    <!-- To automatically render math in text elements, include the auto-render extension: -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.18/dist/contrib/auto-render.min.js"
+        integrity="sha384-vZTG03m+2yp6N6BNi5iM4rW4oIwk5DfcNdFfxkk9ZWpDriOkXX8voJBFrAO7MpVl" crossorigin="anonymous"
+        onload="renderMathInElement(document.body);"></script>
+</head>
+
+<body>
+    <pre><code class="language-javascript">
+        const hello = function(hi){
+            console.log("hi");
+        }
+    </code></pre>
+
+    <div class="md">
+        <h1>条件结构</h1><p>请看如下的猜数字游戏：</p><pre><code class="language-python">import random
+
+# 猜数字游戏 
+print("==猜数字(0-20)==")
+number = random.randint(0,20)
+while True:
+    guess = int(input("请输入你猜的数字："))
+    if guess > number:
+        print("猜大了...")
+        continue
+    elif guess < number:
+        print("猜小了...")
+        continue
+    else:
+        print("猜对了！")
+        break
+print("==猜数字游戏结束==")
+</code></pre><p>程序运行结果：</p><p><img src="https://sophia-1303119720.cos.ap-nanjing.myqcloud.com/Python%E7%8C%9C%E6%95%B0%E5%AD%97%E6%B8%B8%E6%88%8F.png" alt="Python猜数字游戏" title=""></p><p>:bulb: 程序解释：</p><ul><li><code>int(input("请输入你猜的数字："))</code>：<code>input()</code> 表示输出一段提示语句，然后以字符串形式接收你输入的内容，<code>int()</code> 表示把输入的内容转化为整数。</li></ul><ul><li>从以上程序可以看出 Python 程序块没有 <code>{}</code>  ，而是以  <code>:</code>  开始的<strong>缩进组织</strong>方式。</li></ul><p>如果不缩进：</p><pre><code class="language-python">while True:
+guess = int(input("请输入你猜的数字："))
+</code></pre><p>会报错：</p><pre><code class="language-python">File "<string>", line 6
+    guess = int(input("请输入你猜的数字："))
+    ^
+IndentationError: expected an indented block
+</code></pre><p>如果缩进格式不统一：</p><pre><code class="language-python">import random
+
+print("==猜数字(0-20)==")
+number = random.randint(0,20)
+while True:
+    guess = int(input("请输入你猜的数字："))
+  if guess > number:
+        print("猜大了...")
+</code></pre><p>也会报错：</p><pre><code class="language-python">File "<string>", line 7
+if guess > number:
+^
+IndentationError: unindent does not match any outer indentation level
+</code></pre><p>Python 是有意这么设计的，以提高程序的可读性。</p><ul><li>Python 没有 <code>swith ... case...</code>语句：<a href="https://docs.python.org/zh-cn/3/faq/design.html#why-isn-t-there-a-switch-or-case-statement-in-python" title="">设计和历史常见问题 — Python 3.9.7 文档</a></li></ul><h1>循环</h1><p>循环有两种方式：</p><p>1. <code>whie...:</code></p><p>2. <code>for ... in ...:</code></p><p>九九乘法表：</p><pre><code class="language-python">x=1
+while x<=9:
+    y=1
+    while y<=x:
+        print(f"{x:<2}*{y:<2}={x*y:<3}", end="")
+        y=y+1
+    print("")
+    x=x+1
+</code></pre><ul><li>Python 块代码采用<strong>缩进</strong>的方式组织。</li><li><code>print()</code> 可以通过参数 <code>end</code>  控制是否换行，默认是 <code>\n</code> 。</li></ul><p>请看下面数羊代码：</p><pre><code class="language-python">import time
+
+sheep_count = int(input("你有多少只羊:"))
+for number in range(1, sheep_count+1):
+    print(f"{number} 只羊")
+    time.sleep(1)
+</code></pre><ul><li>Python 的 <code>for</code> 语句与 C++ 不同，它主要作用于序列或迭代器，<code>rang()</code> 是一个迭代器，可以生成等差序列：</li></ul><pre><code class="language-python">for x in range(0, 20, 2):
+    print(x, end=" ")
+</code></pre><p>三个参数代表的含义是最小值，最大值，步长，并且遵循“左闭右开”的惯例。</p><p>中午吃什么：</p><pre><code class="language-python">lunches = ['肉夹馍','火锅','刀削面','炒年糕','麻辣香锅','烤肉饭']
+
+for lunch in lunches:
+    print(f"吃 {lunch}")
+</code></pre><h2>两个循环控制关键字</h2><p><code>continue</code> 与 <code>break</code> 是两个控制循序执行流程的关键字，具体功能如图所示：</p><p><img src="https://sophia-1303119720.cos.ap-nanjing.myqcloud.com/continue_break.png" alt="continue_break" title=""></p><p>与其他语言类似。</p>
+    </div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.25.0/prism.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.25.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</script>
+
+</html>
